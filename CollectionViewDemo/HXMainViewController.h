@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  HXMainViewController.h
 //  CollectionViewDemo
 //
 //  Created by miaios on 16/4/19.
@@ -8,8 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
 
+@interface HXMainViewController : UICollectionViewController
 
 @end
-
