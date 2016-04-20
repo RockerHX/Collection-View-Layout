@@ -22,6 +22,7 @@
     
     NSIndexPath *indexPath;
     NSInteger sectionCount = [self.collectionView numberOfSections];
+    NSInteger itemsCount = [self.collectionView numberOfItemsInSection:0];
     
     if (sectionCount > 1) {
         assert(@"Collection View Section Count Must Only One!");
@@ -32,19 +33,18 @@
     CGFloat itemWidth = controlWidht - _itemSpacing*2 - _itemSpilled*2;
     CGFloat itemHeith = controlHeight;
     
-    NSMutableArray *itemAttributes = [NSMutableArray arrayWithCapacity:_numberOfColumns];
+    // 计算x轴
+    CGFloat x = _itemSpacing + _itemSpilled;
+    NSMutableArray *itemAttributes = [NSMutableArray arrayWithCapacity:itemsCount];
     // 遍历item
-    for(NSInteger itemIndex = 0; itemIndex < _numberOfColumns; itemIndex++) {
+    for(NSInteger itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
         indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
         UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
         // 通过协议回传卡片风格
         HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
         
-        // 计算x轴
-        CGFloat x = ((_itemSpacing + itemWidth + _itemSpilled) * itemIndex) + _itemSpacing + _itemSpilled;
-        
         // 计算y轴
-        CGFloat y = 0;
+        CGFloat y = 0.0f;
         HXCollectionViewLayoutStyle lastStyle = HXCollectionViewLayoutStyleHeavy;
         NSIndexPath *lastIndexPath = nil;
         if (itemIndex) {
@@ -52,15 +52,30 @@
             lastStyle = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:lastIndexPath];
         }
         if (style == HXCollectionViewLayoutStylePetty) {
+            itemHeith = (controlHeight - _itemSpacing) / 2;
+            itemWidth = (controlWidht - _itemSpacing*3) / 2;
             if (lastIndexPath && (lastStyle == HXCollectionViewLayoutStylePetty)) {
-                itemWidth = (controlWidht - _itemSpacing*3 - _itemSpilled*2) / 2;
-                y = ((controlHeight - _itemSpacing) / 2) + _itemSpacing;
+                UICollectionViewLayoutAttributes *lastAttributes = [itemAttributes lastObject];
+                if (lastAttributes.frame.origin.y == 0.0f) {
+                    y = itemHeith + _itemSpacing;
+                }
             }
         }
         
         attributes.frame = CGRectMake(x, y, itemWidth, itemHeith);
         // 下一个item的x坐标
-        x += (itemWidth + _itemSpacing);
+        switch (style) {
+            case HXCollectionViewLayoutStyleHeavy: {
+                x += (itemWidth + _itemSpacing);
+                break;
+            }
+            case HXCollectionViewLayoutStylePetty: {
+                if (y > 0.0f) {
+                    x += (itemWidth + _itemSpacing);
+                }
+                break;
+            }
+        }
         
         // 保存item属性
         [itemAttributes addObject:attributes];
@@ -76,12 +91,14 @@
         sizeWidth += (attributes.frame.size.width + _itemSpacing);
     }];
     
+    sizeWidth += (_itemSpacing + _itemSpilled);
+    
     return CGSizeMake(sizeWidth, sizeHeight);
 }
 
 // 3
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
-    NSMutableArray *allAttributes = [NSMutableArray arrayWithCapacity:_layoutAttributes.count];
+    NSMutableArray *allAttributes = @[].mutableCopy;
     [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger idx, BOOL * _Nonnull stop) {
         if (CGRectIntersectsRect(rect, attributes.frame)) {
             [allAttributes addObject:attributes];

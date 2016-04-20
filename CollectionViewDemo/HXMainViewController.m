@@ -16,16 +16,23 @@ HXCollectionViewLayoutDelegate
 @end
 
 
-@implementation HXMainViewController
+@implementation HXMainViewController {
+    NSInteger _itemCount;
+}
 
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    ((HXCollectionViewLayout *)self.collectionView.collectionViewLayout).delegate = self;
+    _itemCount = 20;
+    
+    HXCollectionViewLayout *layout = (HXCollectionViewLayout *)self.collectionView.collectionViewLayout;
+    layout.delegate = self;
+    layout.itemSpacing = 15.0f;
+    layout.itemSpilled = 30.0f;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 30;
+    return _itemCount;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -36,7 +43,7 @@ HXCollectionViewLayoutDelegate
 
 #pragma mark - HXCollectionViewLayoutDelegate Methods
 - (HXCollectionViewLayoutStyle)collectionView:(UICollectionView *)collectionView layout:(HXCollectionViewLayout *)layout styleForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return (indexPath.row <= 10) ? HXCollectionViewLayoutStyleHeavy : HXCollectionViewLayoutStylePetty;
+    return (indexPath.row < 5) ? HXCollectionViewLayoutStyleHeavy : HXCollectionViewLayoutStylePetty;
 }
 
 @end
