@@ -20,7 +20,6 @@
     CGFloat controlWidht = self.collectionView.frame.size.width;
     CGFloat controlHeight = self.collectionView.frame.size.height;
     
-    NSIndexPath *indexPath;
     NSInteger sectionCount = [self.collectionView numberOfSections];
     NSInteger itemsCount = [self.collectionView numberOfItemsInSection:0];
     
@@ -38,7 +37,7 @@
     NSMutableArray *itemAttributes = [NSMutableArray arrayWithCapacity:itemsCount];
     // 遍历item
     for(NSInteger itemIndex = 0; itemIndex < itemsCount; itemIndex++) {
-        indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
         UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
         // 通过协议回传卡片风格
         HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
@@ -46,14 +45,15 @@
         // 计算y轴
         CGFloat y = 0.0f;
         HXCollectionViewLayoutStyle lastStyle = HXCollectionViewLayoutStyleHeavy;
-        NSIndexPath *lastIndexPath = nil;
-        if (itemIndex) {
-            lastIndexPath = [NSIndexPath indexPathForItem:(itemIndex - 1) inSection:0];
-            lastStyle = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:lastIndexPath];
-        }
         if (style == HXCollectionViewLayoutStylePetty) {
             itemHeith = (controlHeight - _itemSpacing) / 2;
             itemWidth = (controlWidht - _itemSpacing*3) / 2;
+            
+            NSIndexPath *lastIndexPath = nil;
+            if (itemIndex) {
+                lastIndexPath = [NSIndexPath indexPathForItem:(itemIndex - 1) inSection:0];
+                lastStyle = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:lastIndexPath];
+            }
             if (lastIndexPath && (lastStyle == HXCollectionViewLayoutStylePetty)) {
                 UICollectionViewLayoutAttributes *lastAttributes = [itemAttributes lastObject];
                 if (lastAttributes.frame.origin.y == 0.0f) {
@@ -62,6 +62,7 @@
             }
         }
         
+//        NSLog(@"%@:%@", @(itemIndex).stringValue, @(x).stringValue);
         attributes.frame = CGRectMake(x, y, itemWidth, itemHeith);
         // 下一个item的x坐标
         switch (style) {
@@ -87,8 +88,22 @@
 - (CGSize)collectionViewContentSize {
     CGFloat sizeHeight = [_layoutAttributes firstObject].frame.size.height;
     __block CGFloat sizeWidth = 0;
-    [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger idx, BOOL * _Nonnull stop) {
-        sizeWidth += (attributes.frame.size.width + _itemSpacing);
+    [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger index, BOOL * _Nonnull stop) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
+        
+        switch (style) {
+            case HXCollectionViewLayoutStyleHeavy: {
+                sizeWidth += (attributes.frame.size.width + _itemSpacing);
+                break;
+            }
+            case HXCollectionViewLayoutStylePetty: {
+                if (attributes.frame.origin.y == 0.0f) {
+                    sizeWidth += (attributes.frame.size.width + _itemSpacing);
+                }
+                break;
+            }
+        }
     }];
     
     sizeWidth += (_itemSpacing + _itemSpilled);
