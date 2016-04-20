@@ -154,13 +154,33 @@
 
 // 3.根据可视范围显示Item
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
-    NSMutableArray *allAttributes = @[].mutableCopy;
+    NSMutableArray *visibleAttributes = @[].mutableCopy;
     [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger idx, BOOL * _Nonnull stop) {
         if (CGRectIntersectsRect(rect, attributes.frame)) {
-            [allAttributes addObject:attributes];
+            [visibleAttributes addObject:attributes];
         }
     }];
-    return allAttributes;
+    return visibleAttributes;
+}
+
+#pragma mark - Optional Methods
+- (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset withScrollingVelocity:(CGPoint)velocity {
+//    NSLog(@"proposedContentOffset:%@", NSStringFromCGPoint(proposedContentOffset));
+//    NSLog(@"velocity:%@", NSStringFromCGPoint(velocity));
+    
+    CGRect proposedContentRect = (CGRect){proposedContentOffset, self.collectionView.frame.size};
+    NSArray<UICollectionViewLayoutAttributes *> *visibleAttributes = [self layoutAttributesForElementsInRect:proposedContentRect];
+    UICollectionViewLayoutAttributes *finialAttribute = [visibleAttributes firstObject];
+    NSInteger itemIndex = [_layoutAttributes indexOfObject:finialAttribute];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
+    HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
+    
+    CGPoint finialPoint = CGPointMake(finialAttribute.frame.origin.x - _itemSpacing, proposedContentOffset.y);
+    if (style == HXCollectionViewLayoutStyleHeavy) {
+        finialPoint.x -= _itemSpilled;
+    }
+    
+    return finialPoint;
 }
 
 @end
