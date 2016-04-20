@@ -13,12 +13,49 @@
     NSArray<UICollectionViewLayoutAttributes *> *_layoutAttributes;
 }
 
+#pragma mark - Init Methods
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+#pragma mark - Load Methods
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    [self setup];
+}
+
+#pragma mark - Configure Methods
+- (void)setup {
+    self.collectionView.showsVerticalScrollIndicator = NO;
+    self.collectionView.showsHorizontalScrollIndicator = NO;
+}
+
+#pragma mark - Property
+- (CGFloat)controlWidht {
+    return self.collectionView.frame.size.width;
+}
+
+- (CGFloat)controlHeight {
+    return self.collectionView.frame.size.height;
+}
+
+- (CGFloat)itemWidth {
+    return self.controlWidht - _itemSpacing*2 - _itemSpilled*2;
+}
+
+- (CGFloat)itemHeight {
+    return self.controlHeight;
+}
+
+#pragma mark - Required Methods
 // 1.计算Item位置
 - (void)prepareLayout {
     [super prepareLayout];
-    
-    CGFloat controlWidht = self.collectionView.frame.size.width;
-    CGFloat controlHeight = self.collectionView.frame.size.height;
     
     NSInteger sectionCount = [self.collectionView numberOfSections];
     NSInteger itemsCount = [self.collectionView numberOfItemsInSection:0];
@@ -28,9 +65,13 @@
         return;
     }
     
+    // 计算控件宽度
+    CGFloat controlWidht = self.controlWidht;
+    CGFloat controlHeight = self.controlHeight;
+    
     // 计算卡片宽度
-    CGFloat itemWidth = controlWidht - _itemSpacing*2 - _itemSpilled*2;
-    CGFloat itemHeith = controlHeight;
+    CGFloat itemWidth = self.itemWidth;
+    CGFloat itemHeith = self.itemHeight;
     
     // 计算x轴
     CGFloat x = _itemSpacing + _itemSpilled;
