@@ -13,7 +13,7 @@
     NSArray<UICollectionViewLayoutAttributes *> *_layoutAttributes;
 }
 
-// 1
+// 1.计算Item位置
 - (void)prepareLayout {
     [super prepareLayout];
     
@@ -84,7 +84,7 @@
     _layoutAttributes = [itemAttributes copy];
 }
 
-// 2
+// 2.计算拖动范围
 - (CGSize)collectionViewContentSize {
     CGFloat sizeHeight = [_layoutAttributes firstObject].frame.size.height;
     __block CGFloat sizeWidth = 0;
@@ -111,7 +111,7 @@
     return CGSizeMake(sizeWidth, sizeHeight);
 }
 
-// 3
+// 3.根据可视范围显示Item
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
     NSMutableArray *allAttributes = @[].mutableCopy;
     [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger idx, BOOL * _Nonnull stop) {
