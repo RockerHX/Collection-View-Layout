@@ -168,19 +168,39 @@
 //    NSLog(@"proposedContentOffset:%@", NSStringFromCGPoint(proposedContentOffset));
 //    NSLog(@"velocity:%@", NSStringFromCGPoint(velocity));
     
-    CGRect proposedContentRect = (CGRect){proposedContentOffset, self.collectionView.frame.size};
-    NSArray<UICollectionViewLayoutAttributes *> *visibleAttributes = [self layoutAttributesForElementsInRect:proposedContentRect];
-    UICollectionViewLayoutAttributes *finialAttribute = [visibleAttributes firstObject];
-    NSInteger itemIndex = [_layoutAttributes indexOfObject:finialAttribute];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
-    HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
-    
-    CGPoint finialPoint = CGPointMake(finialAttribute.frame.origin.x - _itemSpacing, proposedContentOffset.y);
-    if (style == HXCollectionViewLayoutStyleHeavy) {
-        finialPoint.x -= _itemSpilled;
+    UICollectionViewLayoutAttributes *finialAttribute = [self layoutAttributesForElementsInPoint:proposedContentOffset];
+    if (finialAttribute) {
+        NSInteger itemIndex = [_layoutAttributes indexOfObject:finialAttribute];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
+        HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
+        
+        CGPoint finialPoint = CGPointMake(finialAttribute.frame.origin.x - _itemSpacing, proposedContentOffset.y);
+        if (proposedContentOffset.x >= finialAttribute.center.x) {
+            finialPoint.x += (finialAttribute.frame.size.width + _itemSpacing);
+        }
+        
+        if (style == HXCollectionViewLayoutStyleHeavy) {
+            finialPoint.x -= _itemSpilled;
+        }
+        
+        return finialPoint;
+    } else {
+        return [super targetContentOffsetForProposedContentOffset:proposedContentOffset withScrollingVelocity:velocity];
     }
-    
-    return finialPoint;
+}
+
+#pragma mark - Private Methods
+- (UICollectionViewLayoutAttributes *)layoutAttributesForElementsInPoint:(CGPoint)point {
+    CGFloat placeholder = _itemSpacing + _itemSpilled;
+    __block UICollectionViewLayoutAttributes *visibleAttributes = nil;
+    [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger idx, BOOL * _Nonnull stop) {
+        CGRect rect = (CGRect){attributes.frame.origin.x - placeholder, attributes.frame.origin.y, attributes.frame.size};
+        if (CGRectContainsPoint(rect, point)) {
+            visibleAttributes = attributes;
+            return;
+        }
+    }];
+    return visibleAttributes;
 }
 
 @end
