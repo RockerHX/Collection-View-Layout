@@ -88,7 +88,7 @@
         HXCollectionViewLayoutStyle lastStyle = HXCollectionViewLayoutStyleHeavy;
         if (style == HXCollectionViewLayoutStylePetty) {
             itemHeith = (controlHeight - _itemSpacing) / 2;
-            itemWidth = (controlWidht - _itemSpacing*3) / 2;
+            itemWidth = (controlWidht - _itemSpacing*3 - _itemSpilled*2) / 2;
             
             NSIndexPath *lastIndexPath = nil;
             if (itemIndex) {

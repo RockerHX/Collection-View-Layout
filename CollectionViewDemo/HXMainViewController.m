@@ -27,8 +27,8 @@ HXCollectionViewLayoutDelegate
     
     HXCollectionViewLayout *layout = (HXCollectionViewLayout *)self.collectionView.collectionViewLayout;
     layout.delegate = self;
-    layout.itemSpacing = 15.0f;
-    layout.itemSpilled = 30.0f;
+    layout.itemSpacing = 12.0f;
+    layout.itemSpilled = 20.0f;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
