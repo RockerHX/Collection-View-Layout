@@ -29,12 +29,13 @@ typedef NS_ENUM(NSUInteger, HXCollectionViewLayoutStyle) {
 
 @property (weak, nonatomic) id<HXCollectionViewLayoutDelegate> delegate;
 
-@property (nonatomic, assign)    CGFloat itemSpacing;
-@property (nonatomic, assign)    CGFloat itemSpilled;
+@property (nonatomic, assign)    CGFloat  itemSpacing;
+@property (nonatomic, assign)    CGFloat  itemSpilled;
 
-@property (nonatomic, assign, readonly)   CGFloat controlWidht;
-@property (nonatomic, assign, readonly)   CGFloat controlHeight;
-@property (nonatomic, assign, readonly)   CGFloat itemWidth;
-@property (nonatomic, assign, readonly)   CGFloat itemHeight;
+@property (nonatomic, assign, readonly)     CGFloat  controlWidht;
+@property (nonatomic, assign, readonly)     CGFloat  controlHeight;
+@property (nonatomic, assign, readonly)     CGFloat  itemWidth;
+@property (nonatomic, assign, readonly)     CGFloat  itemHeight;
+
 
 @end
