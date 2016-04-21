@@ -183,10 +183,20 @@
             finialPoint.x -= _itemSpilled;
         }
         
+        _indexPath = [self indexPathAtPoint:finialPoint];
         return finialPoint;
     } else {
-        return [super targetContentOffsetForProposedContentOffset:proposedContentOffset withScrollingVelocity:velocity];
+        _indexPath = [self indexPathAtPoint:proposedContentOffset];
+        return proposedContentOffset;
     }
+}
+
+#pragma mark - Public Methods
+- (NSIndexPath *)indexPathAtPoint:(CGPoint)point {
+    UICollectionViewLayoutAttributes *finialAttribute = [self layoutAttributesForElementsInPoint:point];
+    NSInteger itemIndex = [_layoutAttributes indexOfObject:finialAttribute];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
+    return indexPath;
 }
 
 #pragma mark - Private Methods

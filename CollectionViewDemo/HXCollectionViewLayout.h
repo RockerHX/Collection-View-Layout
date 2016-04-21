@@ -37,5 +37,8 @@ typedef NS_ENUM(NSUInteger, HXCollectionViewLayoutStyle) {
 @property (nonatomic, assign, readonly)     CGFloat  itemWidth;
 @property (nonatomic, assign, readonly)     CGFloat  itemHeight;
 
+@property (nonatomic, strong, readonly) NSIndexPath  *indexPath;
+
+- (NSIndexPath *)indexPathAtPoint:(CGPoint)point;
 
 @end
