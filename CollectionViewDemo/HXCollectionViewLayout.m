@@ -11,6 +11,8 @@
 
 @implementation HXCollectionViewLayout {
     NSArray<UICollectionViewLayoutAttributes *> *_layoutAttributes;
+    
+    CGPoint _finialPotin;
 }
 
 #pragma mark - Init Methods
@@ -118,7 +120,6 @@
                 break;
             }
         }
-        
         // 保存item属性
         [itemAttributes addObject:attributes];
     }
@@ -165,8 +166,8 @@
 
 #pragma mark - Optional Methods
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset withScrollingVelocity:(CGPoint)velocity {
-//    NSLog(@"proposedContentOffset:%@", NSStringFromCGPoint(proposedContentOffset));
-//    NSLog(@"velocity:%@", NSStringFromCGPoint(velocity));
+    NSLog(@"proposedContentOffset:%@", NSStringFromCGPoint(proposedContentOffset));
+    NSLog(@"velocity:%@", NSStringFromCGPoint(velocity));
     
     UICollectionViewLayoutAttributes *finialAttribute = [self layoutAttributesForElementsInPoint:proposedContentOffset];
     if (finialAttribute) {
@@ -174,9 +175,13 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
         HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
         
+        NSLog(@"%@", @(itemIndex).stringValue);
         CGPoint finialPoint = CGPointMake(finialAttribute.frame.origin.x - _itemSpacing, proposedContentOffset.y);
-        if (proposedContentOffset.x >= finialAttribute.center.x) {
-            finialPoint.x += (finialAttribute.frame.size.width + _itemSpacing);
+        if (ABS(proposedContentOffset.x - _finialPotin.x) < self.controlWidht) {
+            NSLog(@"ABS:%@", @(ABS(proposedContentOffset.x - _finialPotin.x)).stringValue);
+            if (proposedContentOffset.x >= _finialPotin.x) {
+                finialPoint.x += (finialAttribute.frame.size.width + _itemSpacing);
+            }
         }
         
         if (style == HXCollectionViewLayoutStyleHeavy) {
@@ -184,9 +189,11 @@
         }
         
         _indexPath = [self indexPathAtPoint:finialPoint];
+        _finialPotin = finialPoint;
         return finialPoint;
     } else {
         _indexPath = [self indexPathAtPoint:proposedContentOffset];
+        _finialPotin = proposedContentOffset;
         return proposedContentOffset;
     }
 }
@@ -204,7 +211,7 @@
     CGFloat placeholder = _itemSpacing + _itemSpilled;
     __block UICollectionViewLayoutAttributes *visibleAttributes = nil;
     [_layoutAttributes enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes * _Nonnull attributes, NSUInteger idx, BOOL * _Nonnull stop) {
-        CGRect rect = (CGRect){attributes.frame.origin.x - placeholder, attributes.frame.origin.y, attributes.frame.size};
+        CGRect rect = (CGRect){attributes.frame.origin.x - placeholder, attributes.frame.origin.y, attributes.frame.size.width + placeholder, attributes.frame.size.height};
         if (CGRectContainsPoint(rect, point)) {
             visibleAttributes = attributes;
             return;
