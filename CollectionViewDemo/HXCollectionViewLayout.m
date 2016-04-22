@@ -171,11 +171,6 @@
     
     UICollectionViewLayoutAttributes *finialAttribute = [self layoutAttributesForElementsInPoint:proposedContentOffset];
     if (finialAttribute) {
-        NSInteger itemIndex = [_layoutAttributes indexOfObject:finialAttribute];
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:0];
-        HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:indexPath];
-        
-        NSLog(@"%@", @(itemIndex).stringValue);
         CGPoint finialPoint = CGPointMake(finialAttribute.frame.origin.x - _itemSpacing, proposedContentOffset.y);
         if (ABS(proposedContentOffset.x - _finialPotin.x) < self.controlWidht) {
             NSLog(@"ABS:%@", @(ABS(proposedContentOffset.x - _finialPotin.x)).stringValue);
@@ -184,11 +179,13 @@
             }
         }
         
+        _indexPath = [self indexPathAtPoint:finialPoint];
+        HXCollectionViewLayoutStyle style = [_delegate collectionView:self.collectionView layout:self styleForItemAtIndexPath:_indexPath];
         if (style == HXCollectionViewLayoutStyleHeavy) {
             finialPoint.x -= _itemSpilled;
         }
         
-        _indexPath = [self indexPathAtPoint:finialPoint];
+        NSLog(@"finial index:%@", @(_indexPath.row).stringValue);
         _finialPotin = finialPoint;
         return finialPoint;
     } else {
